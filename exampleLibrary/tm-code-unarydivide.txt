@@ -1,0 +1,58 @@
+# Idea here is to move slider along both inputs. 
+# If they both end on their respective numbers at the same time
+# then the second divides the first. 
+# @ 1 1 1 1 1 ? 1 1 b b b b 
+# Assume second number non-zero and smaller than first.
+q0,@,@,R,q0;
+q0,1,*,R,qSearch;
+qSearch,1,1,R,qSearch;
+qSearch,?,?,R,qInitial$;
+qInitial$,1,$,L,qHome;
+qHome,?,?,L,qHome;
+qHome,1,1,L,qHome;
+qHome,*,*,L,qHome;
+qHome,@,@,N,qFind*;
+# Next block increments both pointers.
+# First increment * Pointer.
+qFind*,@,@,R,qFind*;
+qFind*,1,1,R,qFind*;
+qFind*,*,1,R,qInc*;
+qInc*,1,*,R,qSearchR?;
+# If * printed on ?, then we check position of $. 
+qInc*,?,?,R,qFindB;
+# Search for the $ pointer.
+qSearchR?,1,1,R,qSearchR?;
+qSearchR?,*,*,R,sSearchR?;
+qSearchR?,?,?,R,qFind$;
+# Increment the $ pointer.
+qFind$,1,1,R,qFind$;
+qFind$,$,1,R,qInc$;
+qInc$,1,$,L,qHome;
+qInc$,b,b,L,qSearch?L;
+qSearch?L,1,1,L,qSearch?L;
+qSearch?L,?,?,R,qPrint$;
+qPrint$,1,$,L,qHome;
+# In the case we have * as far right as possible. 
+qFindB,1,1,R,qFindB;
+qFindB,$,$,R,qFindB;
+qFindB,b,b,L,qCheck;
+# cTrue = Clear and print true
+# cFalse = Clear and print false
+qCheck,$,b,L,cTrue;
+cTrue,1,b,L,cTrue;
+cTrue,b,b,L,cTrue;
+cTrue,$,b,L,cTrue;
+cTrue,?,b,L,cTrue;
+cTrue,*,b,L,cTrue;
+cTrue,@,@,R,pTrue;
+pTrue,b,1,L,pTrue;
+pTrue,@,@,N,HALT;
+qCheck,1,b,L,cFalse;
+cFalse,1,b,L,cFalse;
+cFalse,$,b,L,cFalse;
+cFalse,b,b,L,cFalse;
+cFalse,?,b,L,cFalse;
+cFalse,*,b,L,cFalse;
+cFalse,@,@,R,pFalse;
+pFalse,b,0,L,pFalse;
+pFalse,@,@,N,HALT;

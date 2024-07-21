@@ -1,0 +1,93 @@
+# This Turing machine tests whether a single unary input is prime. 
+# It does so by the most naive method: do a division test on every number less than input. 
+### Initial part of the code tests whether the input is one
+### and then sets the tape up for the rest of the computation. 
+q0,@,@,R,q0;
+q0,1,1,R,qOne?;
+qOne?,b,b,L,qOne;
+qOne?,1,1,R,qSetup;
+# qOne implies the input is one.
+qOne,1,0,L,qOne;
+qOne,@,@,N,HALT;
+# qSetup implies the input is greater than one and hence computation should continue. This state starts the division test at 2.
+qSetup,1,1,R,qSetup;
+qSetup,b,?,R,qSetup1;
+qSetup1,b,1,R,qSetup2;
+qSetup2,b,1,L,qHomeEqual;
+#qHomeEqual sends the head home to move into equality test. 
+qHomeEqual,b,b,L,qHomeEqual;
+qHomeEqual,1,1,L,qHomeEqual;
+qHomeEqual,?,?,L,qHomeEqual;
+qHomeEqual,*,*,L,qHomeEqual;
+qHomeEqual,@,@,N,qEqual?;
+# Moved into the qEqual? state to determine if two numbers equal. 
+# If they're EQUAL, then input is PRIME. 
+# If they're NOT equal, then further tests needed. 
+qEqual?,@,@,R,qEqualL*;
+qEqualL*,*,*,R,qEqualL*;
+qEqualL*,1,*,R,qSearch?;
+qEqualL*,?,?,R,qBlankPrime;
+qSearch?,1,1,R,qSearch?;
+qSearch?,*,*,R,qSearch?;
+qSearch?,?,?,R,qEqualR*;
+qEqualR*,*,*,R,qEqualR*;
+qEqualR*,1,*,R,qHomeEqual;
+qEqualR*,b,b,L,qHome1s;
+qHome1s,*,1,L,qHome1s;
+qHome1s,1,1,L,qHome1s;
+qHome1s,?,?,L,qHome1s;
+qHome1s,@,@,N,qHomeDivision;
+# qBlankPrime: blanks tape returns prime. 
+qBlankPrime,*,*,R,qBlankPrime;
+qBlankPrime,1,1,R,qBlankPrime;
+qBlankPrime,b,b,L,qHome1;
+qHome1,1,b,L,qHome1;
+qHome1,*,b,L,qHome1;
+qHome1,?,b,L,qHome1;
+qHome1,@,@,R,qPrint1;
+qPrint1,b,1,L,qPrint1;
+qPrint1,@,@,N,HALT;
+# qHomeDivision: returns home, *s to 1s, starts division test. 
+qHomeDivision,*,1,L,qHomeDivision;
+qHomeDivision,?,?,L,qHomeDivision;
+qHomeDivision,@,@,N,qLeft*;
+qLeft*,@,@,R,qLeft*;
+qLeft*,1,*,R,qRight?;
+qRight?,1,1,R,qRight?;
+qRight?,*,*,R,qRight?;
+qRight?,?,?,R,qRight*;
+qRight*,1,*,L,qSearchLeft*;
+qSearchLeft*,1,1,L,qSearchLeft*;
+qSearchLeft*,?,?,L,qSearchLeft*;
+qSearchLeft*,*,1,R,qIncLeft*;
+qIncLeft*,1,*,R,qSearchRight*;
+qIncLeft*,?,?,R,qCheckRight*;
+# Search for Right * to increment.
+qSearchRight*,1,1,R,qSearchRight*;
+qSearchRight*,?,?,R,qSearchRight*;
+qSearchRight*,*,1,R,qIncRight*;
+qIncRight*,1,*,L,qSearchLeft*;
+qIncRight*,b,b,L,qLeft?;
+# qLeft? resets * on smaller number
+qLeft?,1,1,L,qLeft?;
+qLeft?,?,?,R,qReset*;
+qReset*,1,*,L,qSearchLeft*;
+# Account for IncLeft landing on ?
+qCheckRight*,1,1,R,qCheckRight*;
+qCheckRight*,*,1,R,qDiv?;
+qDiv?,1,1,R,qIncTest;
+qDiv?,b,b,N,cFalse;
+# In this case, the number does not divide. Computation continues.
+# In this case the number does divide, hence input not prime.
+qDiv?,b,b,L,cFalse;
+cFalse,1,b,L,cFalse;
+cFalse,$,b,L,cFalse;
+cFalse,b,b,L,cFalse;
+cFalse,?,b,L,cFalse;
+cFalse,*,b,L,cFalse;
+cFalse,@,@,R,pFalse;
+pFalse,b,0,L,pFalse;
+pFalse,@,@,N,HALT;
+# Once division fails, increment test divisor and go home to equality test. 
+qIncTest,1,1,R,qIncTest;
+qIncTest,b,1,L,qHomeEqual;
